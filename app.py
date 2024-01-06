@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import bcrypt
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@127.0.0.1/miniproject'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 
 class Registration(db.Model):
@@ -15,7 +15,7 @@ class Registration(db.Model):
 def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
 
-@app.route('/register',methods = ['POST'])
+@app.route('/register',methods = ['GET','POST'])
 def register():
     if request.method == 'POST':
         name = request.form['name']
@@ -39,6 +39,7 @@ def index():
     return render_template('index.html',registration = registration )
 
 
-
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
